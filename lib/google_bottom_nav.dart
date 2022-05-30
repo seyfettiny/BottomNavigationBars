@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
+
 class FirstBottomNav extends StatefulWidget {
   const FirstBottomNav({
     Key? key,
@@ -73,7 +74,7 @@ class _FirstBottomNavState extends State<FirstBottomNav>
             ),
             BottomBarItem(
               icon: Ionicons.person_outline,
-              label: 'Proasdasdfile',
+              label: 'Profile',
               selected: _currentIndex == 3,
               selectedColor: Colors.deepPurpleAccent,
               onTap: () {
