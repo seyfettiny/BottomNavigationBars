@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'google_bottom_nav.dart';
+import 'nav_items/google_bottom_nav.dart';
+import 'nav_items/shifting_bottom_nav.dart';
+
 
 void main() => runApp(const MyApp());
 
@@ -9,13 +11,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Material App',
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Material App Bar'),
-        ),
-        body: const HomeScreen(),
+        body: HomeScreen(),
       ),
     );
   }
@@ -32,10 +32,10 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: const [
-          FirstBottomNav(),
+          GoogleBottonNav(),
+          ShiftingBottomNav(),
         ],
       ),
     );
   }
 }
-
