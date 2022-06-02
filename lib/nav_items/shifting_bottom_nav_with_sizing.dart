@@ -10,10 +10,65 @@ class ShiftingBottomNavWithSizing extends StatefulWidget {
 }
 
 class _ShiftingBottomNavWithSizingState
-    extends State<ShiftingBottomNavWithSizing>
-    with SingleTickerProviderStateMixin {
+    extends State<ShiftingBottomNavWithSizing> {
   int _currentIndex = 0;
   int _toIndex = 0;
+  double left = 0.0;
+  double right = 0.0;
+  void animate(BuildContext context) {
+    if (_toIndex < _currentIndex) {
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        setState(() {
+          left =
+              (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
+        });
+      }).whenComplete(() {
+        right = (MediaQuery.of(context).size.width - 46) -
+            (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
+        return null;
+      });
+      right = (MediaQuery.of(context).size.width - 46) -
+          (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
+
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        setState(() {
+          left =
+              (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
+        });
+      });
+    }
+    // if (_toIndex > _currentIndex) {
+    //   Future.delayed(const Duration(milliseconds: 500), () {
+    //     setState(() {
+    //       left =
+    //           (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
+    //     });
+    //   }).whenComplete(() {
+    //     right = (MediaQuery.of(context).size.width - 46) -
+    //         (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
+    //     return null;
+    //   });
+    //   left = (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
+    //   Future.delayed(const Duration(milliseconds: 1200), () {
+    //     setState(() {
+    //       right = (MediaQuery.of(context).size.width - 46) -
+    //           (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
+    //     });
+    //   });
+    //   if (_currentIndex == _toIndex) {
+    //     left =
+    //         (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
+    //     right = (MediaQuery.of(context).size.width - 46) -
+    //         (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
+    //   }
+    // }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // animate(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +77,34 @@ class _ShiftingBottomNavWithSizingState
       color: Colors.white,
       child: Stack(
         children: [
-          ShiftingContainer(
-            currentIndex: _currentIndex,
-            toIndex: _toIndex,
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeInOutCirc,
+            height: AppBar().preferredSize.height,
+            left: left,
+            right: right,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.amber,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ],
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.teal.shade400,
+                    Colors.green,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              width: 50,
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -36,6 +116,7 @@ class _ShiftingBottomNavWithSizingState
                 onTap: () {
                   setState(() {
                     _toIndex = 0;
+                    animate(context);
                     _currentIndex = 0;
                   });
                 },
@@ -47,6 +128,7 @@ class _ShiftingBottomNavWithSizingState
                 onTap: () {
                   setState(() {
                     _toIndex = 1;
+                    animate(context);
                     _currentIndex = 1;
                   });
                 },
@@ -58,6 +140,7 @@ class _ShiftingBottomNavWithSizingState
                 onTap: () {
                   setState(() {
                     _toIndex = 2;
+                    animate(context);
                     _currentIndex = 2;
                   });
                 },
@@ -69,6 +152,7 @@ class _ShiftingBottomNavWithSizingState
                 onTap: () {
                   setState(() {
                     _toIndex = 3;
+                    animate(context);
                     _currentIndex = 3;
                   });
                 },
@@ -110,120 +194,6 @@ class _ShiftingBottomNavWithSizingState
                 child: Text(label)),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ShiftingContainer extends StatefulWidget {
-  const ShiftingContainer({
-    Key? key,
-    required this.currentIndex,
-    required this.toIndex,
-  });
-  final int currentIndex;
-  final int toIndex;
-  @override
-  State<ShiftingContainer> createState() => _ShiftingContainerState();
-}
-
-class _ShiftingContainerState extends State<ShiftingContainer>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController;
-  late final Animation<double> _shiftStartAnimation;
-  late final Animation<double> _shiftFollowUpAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    setupAnimation(widget.currentIndex, widget.toIndex);
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(ShiftingContainer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.currentIndex != widget.currentIndex ||
-        oldWidget.toIndex != widget.toIndex) {
-      setupAnimation(widget.currentIndex, widget.toIndex);
-    }
-  }
-
-  void setupAnimation(int currentIndex, int toIndex) {
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    )..addListener(() {
-        setState(() {});
-      });
-
-    _shiftStartAnimation = Tween<double>(
-      begin: widget.currentIndex.toDouble(),
-      end: widget.toIndex.toDouble(),
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOutCirc,
-      ),
-    )..addStatusListener((status) {
-        // ignore: missing_return
-        if (status == AnimationStatus.completed) {
-          Future.delayed(const Duration(milliseconds: 800), () {
-            _animationController.forward();
-          });
-        }
-      });
-
-    _shiftFollowUpAnimation = Tween<double>(
-      begin: widget.currentIndex.toDouble(),
-      end: widget.toIndex.toDouble(),
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOutCirc,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedPositioned(
-      duration: _animationController.duration!,
-      curve: Curves.easeInOutCirc,
-      height: AppBar().preferredSize.height,
-      left: (MediaQuery.of(context).size.width / 8) *
-              (_animationController.value * 2 + 1) -
-          46,
-      right: (MediaQuery.of(context).size.width - 46) -
-          (MediaQuery.of(context).size.width / 8) *
-              (_animationController.value * 2 + 1),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.amber,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              spreadRadius: 1,
-            ),
-          ],
-          gradient: LinearGradient(
-            colors: [
-              Colors.teal.shade400,
-              Colors.green,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        width: 50,
       ),
     );
   }

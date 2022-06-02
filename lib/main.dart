@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: const [
+        children: [
           GoogleBottonNav(),
           ShiftingBottomNav(),
           ShiftingBottomNavWithSizing(),
