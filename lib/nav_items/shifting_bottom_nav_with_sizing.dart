@@ -11,57 +11,44 @@ class ShiftingBottomNavWithSizing extends StatefulWidget {
 
 class _ShiftingBottomNavWithSizingState
     extends State<ShiftingBottomNavWithSizing> {
+  final double _screenWidth =
+      MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width;
+
   int _currentIndex = 0;
   int _toIndex = 0;
-  double left = 0.0;
-  double right = 0.0;
-  void animate(BuildContext context) {
-    if (_toIndex < _currentIndex) {
-      Future.delayed(const Duration(milliseconds: 1200), () {
-        setState(() {
-          left =
-              (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
-        });
-      }).whenComplete(() {
-        right = (MediaQuery.of(context).size.width - 46) -
-            (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
-        return null;
-      });
-      right = (MediaQuery.of(context).size.width - 46) -
-          (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
 
-      Future.delayed(const Duration(milliseconds: 1200), () {
-        setState(() {
-          left =
-              (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
+  late double left;
+  late double right;
+
+  @override
+  void initState() {
+    left = (_screenWidth / 8) - 46;
+    right = (_screenWidth - 46) - (_screenWidth / 8);
+    super.initState();
+  }
+
+  void animate(BuildContext context) {
+    if (_toIndex > _currentIndex) {
+      setState(() {
+        right = (_screenWidth - 46) - (_screenWidth / 8) * (_toIndex * 2 + 1);
+        Future.delayed(const Duration(milliseconds: 300), () {
+          setState(() {
+            left = (_screenWidth / 8) * (_toIndex * 2 + 1) - 46;
+          });
         });
       });
     }
-    // if (_toIndex > _currentIndex) {
-    //   Future.delayed(const Duration(milliseconds: 500), () {
-    //     setState(() {
-    //       left =
-    //           (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
-    //     });
-    //   }).whenComplete(() {
-    //     right = (MediaQuery.of(context).size.width - 46) -
-    //         (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
-    //     return null;
-    //   });
-    //   left = (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
-    //   Future.delayed(const Duration(milliseconds: 1200), () {
-    //     setState(() {
-    //       right = (MediaQuery.of(context).size.width - 46) -
-    //           (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
-    //     });
-    //   });
-    //   if (_currentIndex == _toIndex) {
-    //     left =
-    //         (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1) - 46;
-    //     right = (MediaQuery.of(context).size.width - 46) -
-    //         (MediaQuery.of(context).size.width / 8) * (_toIndex * 2 + 1);
-    //   }
-    // }
+    if (_toIndex < _currentIndex) {
+      setState(() {
+        left = (_screenWidth / 8) * (_toIndex * 2 + 1) - 46;
+        Future.delayed(const Duration(milliseconds: 300), () {
+          setState(() {
+            right =
+                (_screenWidth - 46) - (_screenWidth / 8) * (_toIndex * 2 + 1);
+          });
+        });
+      });
+    }
   }
 
   @override
@@ -78,7 +65,7 @@ class _ShiftingBottomNavWithSizingState
       child: Stack(
         children: [
           AnimatedPositioned(
-            duration: const Duration(milliseconds: 600),
+            duration: const Duration(milliseconds: 350),
             curve: Curves.easeInOutCirc,
             height: AppBar().preferredSize.height,
             left: left,
