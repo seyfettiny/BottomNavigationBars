@@ -1,4 +1,4 @@
-import 'package:bottomnavigationbars/nav_items/shifting_bottom_nav_with_sizing.dart';
+import 'package:bottomnavigationbars/nav_items/streching_bottom_nav.dart';
 import 'package:flutter/material.dart';
 
 import 'nav_items/google_bottom_nav.dart';
@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
         children: const [
           GoogleBottonNav(),
           ShiftingBottomNav(),
-          ShiftingBottomNavWithSizing(),
+          StrechingBottomNavWithSizing(),
         ],
       ),
     );

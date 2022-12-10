@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
-class ShiftingBottomNavWithSizing extends StatefulWidget {
-  const ShiftingBottomNavWithSizing({Key? key}) : super(key: key);
+class StrechingBottomNavWithSizing extends StatefulWidget {
+  const StrechingBottomNavWithSizing({Key? key}) : super(key: key);
 
   @override
-  State<ShiftingBottomNavWithSizing> createState() =>
-      _ShiftingBottomNavWithSizingState();
+  State<StrechingBottomNavWithSizing> createState() =>
+      _StrechingBottomNavWithSizingState();
 }
 
-class _ShiftingBottomNavWithSizingState
-    extends State<ShiftingBottomNavWithSizing> {
+class _StrechingBottomNavWithSizingState
+    extends State<StrechingBottomNavWithSizing> {
+  //TODO: Since it is final, can be problematic when the screen size changes.
   final double _screenWidth =
       MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width;
 
@@ -54,27 +55,26 @@ class _ShiftingBottomNavWithSizingState
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // animate(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: AppBar().preferredSize.height,
-      color: Colors.white,
+      color: const Color(0xff654ea3),
       child: Stack(
         children: [
           AnimatedPositioned(
             duration: const Duration(milliseconds: 350),
             curve: Curves.easeInOutCirc,
-            height: AppBar().preferredSize.height,
+            height: AppBar().preferredSize.height - 8,
+            top: 4,
             left: left,
             right: right,
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.amber,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: const [
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(24)),
+                boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
                     blurRadius: 8,
@@ -83,8 +83,8 @@ class _ShiftingBottomNavWithSizingState
                 ],
                 gradient: LinearGradient(
                   colors: [
-                    Colors.teal.shade400,
-                    Colors.green,
+                    Color(0xFF91EAE4),
+                    Color(0xFF86A8E7),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -163,22 +163,14 @@ class _ShiftingBottomNavWithSizingState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            AnimatedTheme(
-                duration: const Duration(milliseconds: 300),
-                data: ThemeData(
-                  iconTheme: IconThemeData(
-                    color: selected ? Colors.white : Colors.black87,
-                  ),
-                ),
-                child: Icon(
-                  icon,
-                )),
-            AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 300),
-                style: TextStyle(
-                  color: selected ? Colors.white : Colors.grey,
-                ),
-                child: Text(label)),
+            Icon(
+              icon,
+              color: Colors.white,
+            ),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white),
+            ),
           ],
         ),
       ),
