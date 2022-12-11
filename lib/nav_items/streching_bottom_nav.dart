@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
-class StrechingBottomNavWithSizing extends StatefulWidget {
-  const StrechingBottomNavWithSizing({Key? key}) : super(key: key);
+class StrechingBottomNav extends StatefulWidget {
+  const StrechingBottomNav({Key? key}) : super(key: key);
 
   @override
-  State<StrechingBottomNavWithSizing> createState() =>
-      _StrechingBottomNavWithSizingState();
+  State<StrechingBottomNav> createState() =>
+      _StrechingBottomNavState();
 }
 
-class _StrechingBottomNavWithSizingState
-    extends State<StrechingBottomNavWithSizing> {
+class _StrechingBottomNavState
+    extends State<StrechingBottomNav> {
   //TODO: Since it is final, can be problematic when the screen size changes.
   final double _screenWidth =
       MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width;
