@@ -1,10 +1,11 @@
-import 'package:bottomnavigationbars/nav_items/lamp_bottom_nav.dart';
 import 'package:flutter/material.dart';
 
-import '/nav_items/switching_bottom_nav.dart';
+import 'nav_items/floating_selection_bottom_nav.dart';
 import 'nav_items/google_bottom_nav.dart';
+import 'nav_items/lamp_bottom_nav.dart';
 import 'nav_items/shifting_bottom_nav.dart';
 import 'nav_items/streching_bottom_nav.dart';
+import 'nav_items/switching_bottom_nav.dart';
 
 void main() => runApp(const MyApp());
 
@@ -30,15 +31,17 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Container(
+      color: Colors.grey.shade300,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: const [
+          FloatingSelectionBottomNav(),
           GoogleBottonNav(),
           ShiftingBottomNav(),
           StrechingBottomNav(),
           SwitchingBottomNav(),
-          LampBottomNav()
+          LampBottomNav(),
         ],
       ),
     );

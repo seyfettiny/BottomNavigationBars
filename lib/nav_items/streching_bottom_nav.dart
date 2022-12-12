@@ -5,12 +5,10 @@ class StrechingBottomNav extends StatefulWidget {
   const StrechingBottomNav({Key? key}) : super(key: key);
 
   @override
-  State<StrechingBottomNav> createState() =>
-      _StrechingBottomNavState();
+  State<StrechingBottomNav> createState() => _StrechingBottomNavState();
 }
 
-class _StrechingBottomNavState
-    extends State<StrechingBottomNav> {
+class _StrechingBottomNavState extends State<StrechingBottomNav> {
   //TODO: Since it is final, can be problematic when the screen size changes.
   final double _screenWidth =
       MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width;
