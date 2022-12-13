@@ -1,3 +1,4 @@
+import 'package:bottomnavigationbars/nav_items/blob_menu.nav.dart';
 import 'package:flutter/material.dart';
 
 import 'nav_items/floating_selection_bottom_nav.dart';
@@ -32,10 +33,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.grey.shade300,
+      color: Colors.grey.shade700,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: const [
+          BlobMenu(),
           FloatingSelectionBottomNav(),
           GoogleBottonNav(),
           ShiftingBottomNav(),
