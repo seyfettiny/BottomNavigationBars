@@ -1,8 +1,6 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ionicons/ionicons.dart';
 import 'dart:math' as math;
 
@@ -66,7 +64,7 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
         animation: _animationController,
         builder: (context, child) {
           final double rad = angle * (math.pi / 180.0);
-          final double c = 50;
+          final double c = 1;
           double t = (1.0 - (1 + c)) / 2.0 * 255;
           return Transform(
             transform: Matrix4.identity()
@@ -83,37 +81,14 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
                       : _animationController.reverse();
                 });
               },
-              child: ColorFiltered(
-                colorFilter: ColorFilter.matrix([
-                  1 + c,
-                  0,
-                  0,
-                  0,
-                  t,
-                  0,
-                  1 + c,
-                  0,
-                  0,
-                  t,
-                  0,
-                  0,
-                  1 + c,
-                  0,
-                  t,
-                  0,
-                  0,
-                  0,
-                  1,
-                  0,
-                ]),
-                child: Container(
-                  height: 65,
-                  width: 65,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
+              child: Container(
+                height: 64,
+                width: 64,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
                   child: icons[index],
                 ),
               ),
@@ -224,6 +199,62 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
         ],
       ),
     );
+  }
+}
+
+class MenuItemCustomPainter extends CustomPainter {
+  static const _shaderResolution = 0x1ffe;
+  MenuItemCustomPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    //final double c = 5000;
+    //double t = (1.0 - (1 + c)) / 2.0 * 255;
+    final paint = Paint()
+      ..color = Colors.white
+      //..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10)
+      // ..colorFilter = ColorFilter.matrix([
+      //   // 1 ,0, 0, 0,
+      //   // 0, 0, 1, 0,
+      //   // 0, 0, 0, 0,
+      //   // 1 ,0, 0, 0,
+      //   // 0, 0, 18,-7,
+      //   1 + c, 0, 0, 0,
+      //   t, 0, 1 + c, 0,
+      //   0, t, 0, 0,
+      //   1 + c, 0, t, 0,
+      //   0, 0, 1, 0,
+      // ])
+      ..blendMode = BlendMode.plus
+      ..style = PaintingStyle.fill;
+    // ..shader = const RadialGradient(
+    //     colors: [
+    //       Color(0xffffffff),
+    //       Color(0x09FFFFFF),
+    //       Color(0x00ffffff)
+    //     ],
+    //     tileMode: TileMode.decal,
+    //     stops: [
+    //       0.0,
+    //       0.9,
+    //       1.0,
+    //     ]).createShader(Rect.fromCircle(
+    //   center: Offset(size.width / 2, size.height / 2),
+    //   radius: 80,
+    // ));
+    //canvas.drawPaint(paint);
+    canvas.drawPaint(paint);
+
+    canvas.drawCircle(
+      Offset(size.width / 2, size.height / 2),
+      40,
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }
 
