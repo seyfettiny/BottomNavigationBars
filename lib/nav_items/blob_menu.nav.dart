@@ -1,8 +1,11 @@
 import 'dart:ui';
 
+import 'package:bottomnavigationbars/util/blob.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'dart:math' as math;
+
+import 'package:umbra_flutter/umbra_flutter.dart';
 
 class BlobMenu extends StatefulWidget {
   const BlobMenu({super.key});
@@ -11,6 +14,7 @@ class BlobMenu extends StatefulWidget {
   State<BlobMenu> createState() => _BlobMenuState();
 }
 
+//umbra generate assets/shaders/blob.glsl --output lib/util/ -t flutter-widget
 class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
   final double _screenWidth =
       MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width;
@@ -38,8 +42,6 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
     ),
   ];
 
-  List<AnimatedPositioned> blobMenuItems = [];
-
   @override
   void initState() {
     super.initState();
@@ -64,8 +66,6 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
         animation: _animationController,
         builder: (context, child) {
           final double rad = angle * (math.pi / 180.0);
-          final double c = 1;
-          double t = (1.0 - (1 + c)) / 2.0 * 255;
           return Transform(
             transform: Matrix4.identity()
               ..translate(
@@ -84,8 +84,8 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
               child: Container(
                 height: 64,
                 width: 64,
-                decoration: BoxDecoration(
-                  color: Colors.white,
+                decoration: const BoxDecoration(
+                  color: Color(0xff292E49),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -99,6 +99,16 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
     );
   }
 
+  Vector2 _getTranslationValue(int angle) {
+    final double rad = angle * (math.pi / 180.0);
+    var normalizationFactor = 0.00185;
+
+    return Vector2(
+      (_translationAnimation.value) * math.sin(rad) * normalizationFactor,
+      (_translationAnimation.value) * math.cos(rad) * normalizationFactor,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -106,6 +116,24 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          Positioned(
+            bottom: -76,
+            child: Container(
+              height: 500,
+              width: _screenWidth,
+              color: Color(0xff292E49),
+              child: Blob(
+                scale: 14.0 - _animationController.value * 2,
+                blendMode: BlendMode.plus,
+                uResolution: Vector2(_screenWidth, 500),
+                metaball1: Vector2(0.5, 0.7),
+                metaball2: Vector2(0.5, 0.7) - _getTranslationValue(65),
+                metaball3: Vector2(0.5, 0.7) - _getTranslationValue(22),
+                metaball4: Vector2(0.5, 0.7) - _getTranslationValue(-22),
+                metaball5: Vector2(0.5, 0.7) - _getTranslationValue(-64),
+              ),
+            ),
+          ),
           ...icons
               .map((icon) => _menuItemBuilder(
                   195 - ((icons.indexOf(icon) + 1) * 42), icons.indexOf(icon)))
@@ -117,7 +145,7 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
             width: 70,
             child: Container(
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: Color(0xff292E49),
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
@@ -139,122 +167,70 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
               ),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: ClipPath(
-              clipper: BlobMenuClipper(),
-              child: Container(
-                height: AppBar().preferredSize.height,
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: IconButton(
-                        icon: const Icon(
-                          Ionicons.home,
-                          color: Colors.blueAccent,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                        icon: const Icon(
-                          Ionicons.search,
-                          color: Colors.pinkAccent,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                    const Expanded(
-                      child: SizedBox.square(
-                        dimension: 36,
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                        icon: const Icon(
-                          Ionicons.navigate,
-                          color: Colors.amber,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                    Expanded(
-                      child: IconButton(
-                        icon: const Icon(
-                          Ionicons.person,
-                          color: Colors.deepPurpleAccent,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          )
+          _buildMenu()
         ],
       ),
     );
   }
-}
 
-class MenuItemCustomPainter extends CustomPainter {
-  static const _shaderResolution = 0x1ffe;
-  MenuItemCustomPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    //final double c = 5000;
-    //double t = (1.0 - (1 + c)) / 2.0 * 255;
-    final paint = Paint()
-      ..color = Colors.white
-      //..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10)
-      // ..colorFilter = ColorFilter.matrix([
-      //   // 1 ,0, 0, 0,
-      //   // 0, 0, 1, 0,
-      //   // 0, 0, 0, 0,
-      //   // 1 ,0, 0, 0,
-      //   // 0, 0, 18,-7,
-      //   1 + c, 0, 0, 0,
-      //   t, 0, 1 + c, 0,
-      //   0, t, 0, 0,
-      //   1 + c, 0, t, 0,
-      //   0, 0, 1, 0,
-      // ])
-      ..blendMode = BlendMode.plus
-      ..style = PaintingStyle.fill;
-    // ..shader = const RadialGradient(
-    //     colors: [
-    //       Color(0xffffffff),
-    //       Color(0x09FFFFFF),
-    //       Color(0x00ffffff)
-    //     ],
-    //     tileMode: TileMode.decal,
-    //     stops: [
-    //       0.0,
-    //       0.9,
-    //       1.0,
-    //     ]).createShader(Rect.fromCircle(
-    //   center: Offset(size.width / 2, size.height / 2),
-    //   radius: 80,
-    // ));
-    //canvas.drawPaint(paint);
-    canvas.drawPaint(paint);
-
-    canvas.drawCircle(
-      Offset(size.width / 2, size.height / 2),
-      40,
-      paint,
+  Positioned _buildMenu() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: ClipPath(
+        clipper: BlobMenuClipper(),
+        child: Container(
+          height: AppBar().preferredSize.height,
+          color: Color(0xff292E49),
+          child: Row(
+            children: [
+              Expanded(
+                child: IconButton(
+                  icon: const Icon(
+                    Ionicons.home,
+                    color: Colors.blueAccent,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+              Expanded(
+                child: IconButton(
+                  icon: const Icon(
+                    Ionicons.search,
+                    color: Colors.pinkAccent,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+              const Expanded(
+                child: SizedBox.square(
+                  dimension: 36,
+                ),
+              ),
+              Expanded(
+                child: IconButton(
+                  icon: const Icon(
+                    Ionicons.navigate,
+                    color: Colors.amber,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+              Expanded(
+                child: IconButton(
+                  icon: const Icon(
+                    Ionicons.person,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
   }
 }
 

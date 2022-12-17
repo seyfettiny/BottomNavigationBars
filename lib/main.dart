@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black87,
+      color: Color.fromRGBO(0, 0, 0, 0.867),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: const [
