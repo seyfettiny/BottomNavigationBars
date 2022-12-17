@@ -23,7 +23,13 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _translationAnimation;
 
-  List<Icon> icons = [
+  late final _itemSlideTime;
+  late final _initialDelayTime;
+  late final _staggerDuration;
+  late final _animationDuration;
+  final List<Interval> _itemSlideIntervals = [];
+
+  final List<Icon> _icons = [
     const Icon(
       Ionicons.attach,
       color: Colors.blueAccent,
@@ -45,14 +51,28 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    _initialDelayTime = const Duration(milliseconds: 150);
+    _itemSlideTime = const Duration(milliseconds: 150);
+    _staggerDuration = const Duration(milliseconds: 150);
+    _animationDuration = _initialDelayTime + (_staggerDuration * _icons.length);
+
+    for (int i = 0; i < _icons.length; ++i) {
+      final startTime = _initialDelayTime + (_staggerDuration * i);
+      final endTime = startTime + _itemSlideTime;
+      _itemSlideIntervals.add(Interval(
+          startTime.inMilliseconds / _animationDuration.inMilliseconds,
+          endTime.inMilliseconds / _animationDuration.inMilliseconds,
+          curve: Curves.bounceInOut));
+    }
+
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: _animationDuration,
     );
 
     _translationAnimation = Tween<double>(begin: 0, end: 100).animate(
-      CurvedAnimation(
-          parent: _animationController, curve: Curves.fastOutSlowIn),
+      CurvedAnimation(parent: _animationController, curve: Curves.bounceInOut),
     )..addListener(() {
         setState(() {});
       });
@@ -66,11 +86,17 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
         animation: _animationController,
         builder: (context, child) {
           final double rad = angle * (math.pi / 180.0);
+          final animationPercent = Curves.bounceInOut.transform(
+            _itemSlideIntervals.reversed
+                .toList()[index]
+                .transform(_animationController.value),
+          );
+          final slideDistance = (1.0 - animationPercent) * 100;
           return Transform(
             transform: Matrix4.identity()
               ..translate(
-                (_translationAnimation.value) * math.cos(rad),
-                -(_translationAnimation.value) * math.sin(rad),
+                (slideDistance) * math.cos(rad),
+                -(slideDistance) * math.sin(rad),
               ),
             child: InkWell(
               onTap: () {
@@ -89,7 +115,7 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: icons[index],
+                  child: _icons[index],
                 ),
               ),
             ),
@@ -99,44 +125,56 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
     );
   }
 
-  Vector2 _getTranslationValue(int angle) {
+  Vector2 _getTranslationValue(int index, int angle) {
     final double rad = angle * (math.pi / 180.0);
+    final animationPercent = Curves.bounceInOut.transform(
+      _itemSlideIntervals.reversed
+          .toList()[index]
+          .transform(_animationController.value),
+    );
+    final slideDistance = (1.0 - animationPercent) * 100;
     var normalizationFactor = 0.00185;
 
     return Vector2(
-      (_translationAnimation.value) * math.sin(rad) * normalizationFactor,
-      (_translationAnimation.value) * math.cos(rad) * normalizationFactor,
+      (slideDistance) * math.sin(rad) * normalizationFactor,
+      (slideDistance) * math.cos(rad) * normalizationFactor,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    print(_animationController.value);
     return SizedBox(
       height: AppBar().preferredSize.height + 108,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           Positioned(
-            bottom: -76,
+            bottom: -74,
             child: Container(
               height: 500,
               width: _screenWidth,
-              color: Color(0xff292E49),
+              color: const Color(0xff292E49),
               child: Blob(
-                scale: 14.0 - _animationController.value * 2,
+                scale: 14.0 -
+                    2 *
+                        (1 -
+                            _itemSlideIntervals[2]
+                                .transform(_animationController.value)),
                 blendMode: BlendMode.plus,
                 uResolution: Vector2(_screenWidth, 500),
                 metaball1: Vector2(0.5, 0.7),
-                metaball2: Vector2(0.5, 0.7) - _getTranslationValue(65),
-                metaball3: Vector2(0.5, 0.7) - _getTranslationValue(22),
-                metaball4: Vector2(0.5, 0.7) - _getTranslationValue(-22),
-                metaball5: Vector2(0.5, 0.7) - _getTranslationValue(-64),
+                metaball2: Vector2(0.5, 0.7) - _getTranslationValue(0, 65),
+                metaball3: Vector2(0.5, 0.7) - _getTranslationValue(1, 22),
+                metaball4: Vector2(0.5, 0.7) - _getTranslationValue(2, -22),
+                metaball5: Vector2(0.5, 0.7) - _getTranslationValue(3, -64),
               ),
             ),
           ),
-          ...icons
+          ..._icons
               .map((icon) => _menuItemBuilder(
-                  195 - ((icons.indexOf(icon) + 1) * 42), icons.indexOf(icon)))
+                  195 - ((_icons.indexOf(icon) + 1) * 42),
+                  _icons.indexOf(icon)))
               .toList(),
           Positioned(
             bottom: 18,
@@ -154,8 +192,8 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
                   setState(() {
                     isSelected = !isSelected;
                     isSelected
-                        ? _animationController.forward()
-                        : _animationController.reverse();
+                        ? _animationController.reverse()
+                        : _animationController.forward();
                   });
                 },
                 child: AnimatedIcon(
@@ -182,7 +220,7 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
         clipper: BlobMenuClipper(),
         child: Container(
           height: AppBar().preferredSize.height,
-          color: Color(0xff292E49),
+          color: const Color(0xff292E49),
           child: Row(
             children: [
               Expanded(
