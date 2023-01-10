@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:bottomnavigationbars/util/blob.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
@@ -52,9 +50,9 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _initialDelayTime = const Duration(milliseconds: 150);
-    _itemSlideTime = const Duration(milliseconds: 150);
-    _staggerDuration = const Duration(milliseconds: 150);
+    _initialDelayTime = const Duration(milliseconds: 500);
+    _itemSlideTime = const Duration(milliseconds: 500);
+    _staggerDuration = const Duration(milliseconds: 500);
     _animationDuration = _initialDelayTime + (_staggerDuration * _icons.length);
 
     for (int i = 0; i < _icons.length; ++i) {
@@ -63,7 +61,7 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
       _itemSlideIntervals.add(Interval(
           startTime.inMilliseconds / _animationDuration.inMilliseconds,
           endTime.inMilliseconds / _animationDuration.inMilliseconds,
-          curve: Curves.bounceInOut));
+          curve: Curves.decelerate));
     }
 
     _animationController = AnimationController(
@@ -80,13 +78,13 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
 
   Widget _menuItemBuilder(int angle, int index) {
     return Positioned(
-      bottom: 20,
+      bottom: 25,
       left: _screenWidth / 2 - 32,
       child: AnimatedBuilder(
         animation: _animationController,
         builder: (context, child) {
           final double rad = angle * (math.pi / 180.0);
-          final animationPercent = Curves.bounceInOut.transform(
+          final animationPercent = Curves.easeOutCubic.transform(
             _itemSlideIntervals.reversed
                 .toList()[index]
                 .transform(_animationController.value),
@@ -127,7 +125,7 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
 
   Vector2 _getTranslationValue(int index, int angle) {
     final double rad = angle * (math.pi / 180.0);
-    final animationPercent = Curves.bounceInOut.transform(
+    final animationPercent = Curves.easeOutCubic.transform(
       _itemSlideIntervals.reversed
           .toList()[index]
           .transform(_animationController.value),
@@ -143,14 +141,13 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print(_animationController.value);
     return SizedBox(
       height: AppBar().preferredSize.height + 108,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           Positioned(
-            bottom: -74,
+            bottom: -70,
             child: Container(
               height: 500,
               width: _screenWidth,
@@ -177,7 +174,7 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
                   _icons.indexOf(icon)))
               .toList(),
           Positioned(
-            bottom: 18,
+            bottom: 25,
             left: _screenWidth / 2 - 35,
             height: 70,
             width: 70,
@@ -197,7 +194,7 @@ class _BlobMenuState extends State<BlobMenu> with TickerProviderStateMixin {
                   });
                 },
                 child: AnimatedIcon(
-                  icon: AnimatedIcons.view_list,
+                  icon: AnimatedIcons.close_menu,
                   size: 36,
                   color: Colors.green.shade600,
                   progress: _animationController,
